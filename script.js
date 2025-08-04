@@ -9,7 +9,7 @@ let baseY = 330;
 let selectedPosition = null;
 let previewGroup = null;
 
-const chainImage = 'Chain.svg';
+const chainImage = 'chain.svg';
 const burdenImage = 'burden.svg';
 const chainSpacing = 15;
 const chainSize = 50;
@@ -172,3 +172,4 @@ window.addEventListener("keydown", (e) => {
     `Click on the rocket area to place your burden.`;
   form.reset();
 };
+

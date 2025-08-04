@@ -1,4 +1,4 @@
-// Script for rocket burdened with size slider
+// Script for rocket burdened with size slider /
 
 let selectedBurdenGroup = null;
 let svg = document.getElementById('rocket-svg');
@@ -94,4 +94,5 @@ form.onsubmit = (e) => {
   // ⛓️ Chain links
   const dx = x - baseX;
   con
+
 

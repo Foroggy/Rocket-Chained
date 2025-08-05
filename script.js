@@ -1,4 +1,6 @@
-// Script for rocket burdened with size slider
+Now I want to edit another code. I want the burden size scale to be a slider 1-100, largest size being the current "20".
+
+//Script for rocket burdened 
 
 let selectedBurdenGroup = null;
 let svg = document.getElementById('rocket-svg');
@@ -14,12 +16,6 @@ const burdenImage = 'burden.svg';
 const chainSpacing = 15;
 const chainSize = 50;
 let currentSize = 50;
-
-// 🎚️ Listen for slider changes
-document.getElementById('burden-size').addEventListener('input', function () {
-  document.getElementById('sizeValue').textContent = this.value;
-  updatePreview();
-});
 
 // 🖱️ Click to preview position
 svg.addEventListener('click', function (e) {
@@ -38,7 +34,7 @@ function updatePreview() {
 
   const text = document.getElementById('burden-text').value || "Preview";
   const sizeLevel = parseInt(document.getElementById('burden-size').value) || 1;
-  currentSize = (sizeLevel / 100) * (20 * 50); // scale so 100 = old size 20
+  currentSize = sizeLevel * 50;
   const x = selectedPosition.x;
   const y = selectedPosition.y;
 
@@ -67,6 +63,7 @@ function updatePreview() {
 }
 
 document.getElementById('burden-text').addEventListener('input', updatePreview);
+document.getElementById('burden-size').addEventListener('input', updatePreview);
 
 // ➕ Place burden
 form.onsubmit = (e) => {
@@ -79,7 +76,7 @@ form.onsubmit = (e) => {
 
   const text = document.getElementById('burden-text').value;
   const sizeLevel = parseInt(document.getElementById('burden-size').value);
-  const size = (sizeLevel / 100) * (20 * 50); // scale size
+  const size = sizeLevel * 50;
   const x = selectedPosition.x;
   const y = selectedPosition.y;
 
@@ -139,26 +136,32 @@ form.onsubmit = (e) => {
 
   // 🗑️ Click-to-delete handler
   burdenGroup.addEventListener("click", (e) => {
-    e.stopPropagation(); // prevent deselect on svg click
-    svg.querySelectorAll(".burden").forEach(b => b.classList.remove("selected"));
-    burdenGroup.classList.add("selected");
-    selectedBurdenGroup = burdenGroup;
-  });
+  e.stopPropagation(); // prevent deselect on svg click
+  // Deselect others
+  svg.querySelectorAll(".burden").forEach(b => b.classList.remove("selected"));
+  burdenGroup.classList.add("selected");
+  selectedBurdenGroup = burdenGroup;
+});
 
-  // 🧹 Deselect burden when clicking outside
-  svg.addEventListener("click", () => {
-    svg.querySelectorAll(".burden").forEach(b => b.classList.remove("selected"));
+// 🧹 Deselect burden when clicking outside
+svg.addEventListener("click", () => {
+  svg.querySelectorAll(".burden").forEach(b => b.classList.remove("selected"));
+  selectedBurdenGroup = null;
+});
+
+window.addEventListener("keydown", (e) => {
+  if ((e.key === "Delete" || e.key === "Backspace") && selectedBurdenGroup) {
+    const burdenId = selectedBurdenGroup.getAttribute("id");
+
+    // Remove all matching chains
+    svg.querySelectorAll(`.chain-link[data-burden-id="${burdenId}"]`).forEach(el => el.remove());
+
+    // Remove the burden
+    selectedBurdenGroup.remove();
     selectedBurdenGroup = null;
-  });
+  }
+});
 
-  window.addEventListener("keydown", (e) => {
-    if ((e.key === "Delete" || e.key === "Backspace") && selectedBurdenGroup) {
-      const burdenId = selectedBurdenGroup.getAttribute("id");
-      svg.querySelectorAll(`.chain-link[data-burden-id="${burdenId}"]`).forEach(el => el.remove());
-      selectedBurdenGroup.remove();
-      selectedBurdenGroup = null;
-    }
-  });
 
   // 🧼 Cleanup
   if (previewGroup) {

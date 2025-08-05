@@ -21,6 +21,9 @@ document.getElementById('burden-size').addEventListener('input', function () {
   updatePreview();
 });
 
+// 📄 Live update burden text
+document.getElementById('burden-text').addEventListener('input', updatePreview);
+
 // 🖱️ Click to preview position
 svg.addEventListener('click', function (e) {
   const pt = svg.createSVGPoint();
@@ -33,7 +36,8 @@ svg.addEventListener('click', function (e) {
 
 // 🎯 Live preview of burden
 function updatePreview() {
-  if (!selectedPosition) return;
+  if (!selectedPosition) return; // No position yet
+
   if (previewGroup) svg.removeChild(previewGroup);
 
   const text = document.getElementById('burden-text').value || "Preview";
@@ -69,8 +73,6 @@ function updatePreview() {
 
   svg.appendChild(previewGroup);
 }
-
-document.getElementById('burden-text').addEventListener('input', updatePreview);
 
 // ➕ Place burden
 form.onsubmit = (e) => {
@@ -166,16 +168,11 @@ form.onsubmit = (e) => {
     }
   });
 
-  // 🧼 Cleanup
+  // 🧼 Cleanup preview only (keep position so preview stays active)
   if (previewGroup) {
     svg.removeChild(previewGroup);
     previewGroup = null;
   }
-
-  selectedPosition = null;
-  document.getElementById("click-instruction").innerText =
-    `Click on the rocket area to place your burden.`;
-  form.reset();
 };
 
 

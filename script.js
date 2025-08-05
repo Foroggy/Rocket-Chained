@@ -1,4 +1,4 @@
-// Script for rocket burdened with size slider /
+// Script for rocket burdened with size slider
 
 let selectedBurdenGroup = null;
 let svg = document.getElementById('rocket-svg');
@@ -93,6 +93,82 @@ form.onsubmit = (e) => {
 
   // ⛓️ Chain links
   const dx = x - baseX;
-  con
+  const dy = y - baseY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  const steps = Math.floor(distance / chainSpacing);
+  const angleRad = Math.atan2(dy, dx);
 
+  for (let i = 1; i < steps; i++) {
+    const cx = baseX + (dx * i / steps);
+    const cy = baseY + (dy * i / steps);
+
+    const chainImg = document.createElementNS("http://www.w3.org/2000/svg", "image");
+    chainImg.setAttribute("href", chainImage);
+    chainImg.setAttribute("width", chainSize);
+    chainImg.setAttribute("height", chainSize);
+    chainImg.setAttribute("x", cx - chainSize / 2);
+    chainImg.setAttribute("y", cy - chainSize / 2);
+    const degrees = angleRad * 180 / Math.PI + 90;
+    chainImg.setAttribute("transform", `rotate(${degrees}, ${cx}, ${cy})`);
+    chainImg.setAttribute("class", "chain-link");
+    chainImg.setAttribute("data-burden-id", burdenId);
+    svg.appendChild(chainImg);
+  }
+
+  // ⚪ Burden image
+  const burdenSvg = document.createElementNS("http://www.w3.org/2000/svg", "image");
+  burdenSvg.setAttribute("href", burdenImage);
+  burdenSvg.setAttribute("width", size);
+  burdenSvg.setAttribute("height", size);
+  burdenSvg.setAttribute("x", -size / 2);
+  burdenSvg.setAttribute("y", -size / 2);
+  burdenGroup.appendChild(burdenSvg);
+
+  // 🏷️ Label
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("x", 0);
+  label.setAttribute("y", 5);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("fill", "white");
+  label.setAttribute("font-size", Math.min(16, size / 8));
+  label.setAttribute("font-weight", "bold");
+  label.textContent = text;
+  burdenGroup.appendChild(label);
+
+  svg.appendChild(burdenGroup);
+
+  // 🗑️ Click-to-delete handler
+  burdenGroup.addEventListener("click", (e) => {
+    e.stopPropagation(); // prevent deselect on svg click
+    svg.querySelectorAll(".burden").forEach(b => b.classList.remove("selected"));
+    burdenGroup.classList.add("selected");
+    selectedBurdenGroup = burdenGroup;
+  });
+
+  // 🧹 Deselect burden when clicking outside
+  svg.addEventListener("click", () => {
+    svg.querySelectorAll(".burden").forEach(b => b.classList.remove("selected"));
+    selectedBurdenGroup = null;
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if ((e.key === "Delete" || e.key === "Backspace") && selectedBurdenGroup) {
+      const burdenId = selectedBurdenGroup.getAttribute("id");
+      svg.querySelectorAll(`.chain-link[data-burden-id="${burdenId}"]`).forEach(el => el.remove());
+      selectedBurdenGroup.remove();
+      selectedBurdenGroup = null;
+    }
+  });
+
+  // 🧼 Cleanup
+  if (previewGroup) {
+    svg.removeChild(previewGroup);
+    previewGroup = null;
+  }
+
+  selectedPosition = null;
+  document.getElementById("click-instruction").innerText =
+    `Click on the rocket area to place your burden.`;
+  form.reset();
+};
 
